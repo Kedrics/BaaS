@@ -21,7 +21,7 @@ git checkout -b branch_name
 To make a migration, follow the naming format {database_change}_migration_{next_number}.sql
 To make a change in the website, edit the contents of the website folder.
 
-After making changes, create a commit message with this [style guide](https://www.conventionalcommits.org/en/v1.0.0/).
+After making changes, create a commit message with this [conventional commits style guide](https://www.conventionalcommits.org/en/v1.0.0/).
 ```
 git commit -m "<type>[optional scope]: <description>"
 ```
