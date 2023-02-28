@@ -14,6 +14,7 @@ CHECK (email REGEXP '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
 CHECK (ip REGEXP '^([0-9]{1,3}\.){3}[0-9]{1,3}$')
 
 -- All IDs (Primary Keys) are defined using UUID format (XXXXXXXX-XXXX-4XXX-XXXX-XXXXXXXXXXXX)
+CHECK (User_ID REGEXP '^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[8|9|A|a|B|b][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}$')
 
 -- Botnet order price is a calculated field, equal to number of bots * bot cost
 
