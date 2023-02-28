@@ -22,7 +22,7 @@ VALUES (9999, 10, 50.00, 9999);
 
 -- Insert dummy data into Botnet_Order table
 INSERT INTO Botnet_Order (Order_ID, Number_of_bots, Time_of_use, Price, Approved, Time_stamp, User_ID)
-VALUES (9999, 100, 30.0, 500.00, 1, '2022-09-20 10:15:00', 9999);
+VALUES (9999, 100, 8.0, 500.00, 1, '2022-09-20 10:15:00', 9999);
 
 -- Insert dummy data into Manages (Support_Tickets) table
 INSERT INTO Manages (Staff_ID, Ticket_ID)
