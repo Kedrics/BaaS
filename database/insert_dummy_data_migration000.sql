@@ -13,8 +13,8 @@ INSERT INTO Support_Tickets (Ticket_ID, Description, Messages, Time_stamp, User_
 VALUES (9999, 'I cannot log into my account', 'Please help me reset my password', '2022-10-15 14:35:00', 9999);
 
 -- Insert dummy data into Support_Staff table
-INSERT INTO Support_Staff (Staff_ID, Developer)
-VALUES (9999, 1);
+INSERT INTO Support_Staff (Staff_ID, Developer, User_ID)
+VALUES (9999, 1, 9999);
 
 -- Insert dummy data into Affiliates table
 INSERT INTO Affiliates (Affiliate_ID, Total_bots_added, Money_received, User_ID)
