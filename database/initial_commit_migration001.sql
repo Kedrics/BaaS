@@ -36,7 +36,9 @@ CREATE TABLE Support_Staff
 (
   Staff_ID SERIAL NOT NULL,
   Developer INT,
-  PRIMARY KEY (Staff_ID)
+  User_ID BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (Staff_ID),
+  FOREIGN KEY (User_ID) REFERENCES User(User_ID)
 );
 
 CREATE TABLE Affiliates
