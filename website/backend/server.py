@@ -2,11 +2,14 @@
 from flask import Flask, jsonify, request
 import jwt, secrets
 from flask_mysqldb import MySQL # sudo apt install default-libmysqlclient-dev
+from functools import wraps
 
 
 # initialize flask
 app = Flask(__name__)
 PORT = 8080
+BOT_PRICE_LINUX_WINDOWS = 25.00
+BOT_PRICE_MACOS = 50.00
 
 # set up MySQL integration
 app.config['MYSQL_HOST'] = 'localhost'
@@ -36,6 +39,7 @@ def token_required(f):
             return jsonify({'message': 'Token is invalid'}), 401
         
         return f(session_data, *args, **kwargs)
+    return decorator
 
 
 ### REGISTER/LOGIN FUNCTIONALITY ###
