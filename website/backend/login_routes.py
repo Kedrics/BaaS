@@ -86,7 +86,7 @@ def post_login():
     # insert MySQL query here, return test data for the moment
     hash = 'a2c96d518f1099a3b6afe29e443340f9f5fdf1289853fc034908444f2bcb8982' # hash of 'testtesttest'
     if sha256(password.encode()).hexdigest() != hash:
-        return jsonify({'message': 'Invalid username or password'}), 500
+        return jsonify({'message': 'Invalid username or password'}), 401
     
     # generate JWT
     token = jwt.encode({'user_id': user_id, "is_staff": is_staff}, app.config['SECRET_KEY'], algorithm='HS256')

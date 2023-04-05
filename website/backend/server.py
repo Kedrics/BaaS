@@ -10,6 +10,7 @@ app = Flask(__name__)
 PORT = 8080
 BOT_PRICE_LINUX_WINDOWS = 25.00
 BOT_PRICE_MACOS = 50.00
+BOT_MONTHLY_PRICE = 5.00
 
 # set up MySQL integration
 app.config['MYSQL_HOST'] = 'localhost'
