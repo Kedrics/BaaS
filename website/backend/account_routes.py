@@ -18,7 +18,7 @@ def get_user(session_data, user_id):
     user_data = cur.fetchone()
     cur.close()
     # insert MySQL query here, return test data for the moment
-    user_data = {"user_id": 123, "email": "johndoe@example.com", "username": "johndoe", "blocked": False, "bitcoin_wallet": "0x1234567890abcdef"}
+    # user_data = {"user_id": 123, "email": "johndoe@example.com", "username": "johndoe", "blocked": False, "bitcoin_wallet": "0x1234567890abcdef"}
 
     if not user_data:
         return jsonify({'message': 'User not found'}), 404
@@ -31,20 +31,20 @@ def get_user(session_data, user_id):
 @token_required
 def get_affiliate(session_data, affiliate_id):
     # get user_id from affiliate_id
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT * FROM affiliates WHERE affiliate_id=%s", (affiliate_id))
+    response = cur.fetchone()
+    cur.close()
     # insert MySQL query here, return test data for the moment
-    user_id = 123
+    user_id = response["user_id"]
 
     # ensure user is authorized to access the information
     if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
         return jsonify({'message': 'You do not have permission to access this information'}), 403
     
     # get affiliate information
-    cur = mysql.get_db().cursor()
-    cur.execute("SELECT affiliate_id, user_id, total_bots_added, money_received FROM Affiliates WHERE affiliate_id=%s", (affiliate_id))
-    user_data = cur.fetchone()
-    # insert MySQL query here, return test data for the moment
-    cur.close()
-    affiliate_data = {"affiliate_id": affiliate_id, "user_id": user_id, "total_bots_added": 10, "money_received": 100.0}
+    affiliate_data = response
+    # affiliate_data = {"affiliate_id": affiliate_id, "user_id": user_id, "total_bots_added": 10, "money_received": 100.0}
 
     if not affiliate_data:
         return jsonify({'message': 'Affiliate not found'}), 404
@@ -87,9 +87,9 @@ def post_add_bot(session_data):
     mysql.connection.commit()
     bot_id = cur.lastrowid
     cur.execute("INSERT INTO Adds VALUES (%s, %s)", (bot_id, affiliate_id))
-    # update affiliate information
+    # update affiliate information - what does this entail?
     # insert MySQL query here, return test data for the moment
-    response = {"bot_id": 123, "payment": BOT_PRICE_LINUX_WINDOWS if os!='MacOS' else BOT_PRICE_MACOS}
+    # response = {"bot_id": 123, "payment": BOT_PRICE_LINUX_WINDOWS if os!='MacOS' else BOT_PRICE_MACOS}
     
     return jsonify(response), 200
 

@@ -9,18 +9,21 @@ from datetime import datetime
 @token_required
 def get_ticket(session_data, ticket_id):
     # get user_id from ticket_id
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT * FROM support_tickets WHERE ticket_id=%s", (ticket_id))
+    response = cur.fetchone()
+    cur.close()
     # insert MySQL query here, return test data for the moment
-    user_id = 123
+    user_id = response["user_id"]
+    # insert MySQL query here, return test data for the moment
+    # user_id = 123
 
     # ensure user is authorized to access the information
     if not session_data['is_staff'] and session_data['user_id'] != user_id:
         return jsonify({'message': 'You do not have permission to access this information'}), 403
     
     # get ticket information
-    cur = mysql.get_db().cursor()
-    cur.execute("SELECT * FROM support_tickets WHERE ticket_id=%s", (ticket_id))
-    data = cur.fetchone()
-    cur.close()
+    data = response
     # insert MySQL query here, return test data for the moment
     # data = {"ticket_id": ticket_id, "user_id": user_id, "description": "Test ticket", "messages":"no"}
 
