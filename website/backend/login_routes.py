@@ -1,5 +1,5 @@
 # imports
-from __main__ import app#, mysql
+from __main__ import app, mysql
 from flask import jsonify, request, make_response
 import re, jwt
 from hashlib import sha256
@@ -29,8 +29,11 @@ def post_register():
         return jsonify({'message': 'Invalid username length'}), 400
     
     # ensure username isn't already taken
-    # insert MySQL query here, return test data for the moment
-    username_taken = False
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT username FROM User WHERE username=%s", (username))
+    users_found = cur.rowcount
+    cur.close()
+    username_taken = (users_found > 0)
 
     if username_taken:
         return jsonify({'message': 'Username already taken'}), 500
@@ -44,10 +47,13 @@ def post_register():
         return jsonify({'message': 'Invalid bitcoin wallet'}), 400
 
     # insert user into database
-    # insert MySQL query here, return test data for the moment
+    cur = mysql.get_db().cursor()
+    cur.execute("INSERT INTO User (email, username, password, blocked, bitcoin_wallet) VALUES (%s, %s, %s, %s, %s)", (email, username, sha256(password.encode()).hexdigest(), 0, bitcoin_wallet))
+    mysql.connection.commit()
+    user_id = cur.lastrowid
+    cur.close()
     # use sha256(password.encode()).hexdigest() as password_hash
-    response = {"user_id": 123}
-
+    response = {"user_id": user_id}
     return jsonify(response), 200
 
 
@@ -74,17 +80,28 @@ def post_login():
         return jsonify({'message': 'Password doesn\'t fit length requirements'}), 400
     
     # check if username exists
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT * FROM User WHERE username=%s", (username))
+    users_found = cur.rowcount
+    response = cur.fetchone()
+    cur.close()
     # insert MySQL query here, return test data for the moment
-    exists = True
-    user_id = 123
-    is_staff = False
+    exists = (users_found > 0)
+    user_id = response["user_id"]
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT * FROM support_staff WHERE user_id=%s", (user_id))
+    staff_found = cur.rowcount
+    cur.close()
+    is_staff = (staff_found > 0)
 
     if not exists:
         return jsonify({'message': 'Invalid username or password'}), 401
     
     # check if password is correct
     # insert MySQL query here, return test data for the moment
-    hash = 'a2c96d518f1099a3b6afe29e443340f9f5fdf1289853fc034908444f2bcb8982' # hash of 'testtesttest'
+   
+    # hash = 'a2c96d518f1099a3b6afe29e443340f9f5fdf1289853fc034908444f2bcb8982' # hash of 'testtesttest'
+    hash =  response["password"]
     if sha256(password.encode()).hexdigest() != hash:
         return jsonify({'message': 'Invalid username or password'}), 401
     

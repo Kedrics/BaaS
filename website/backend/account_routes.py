@@ -16,6 +16,7 @@ def get_user(session_data, user_id):
     cur = mysql.get_db().cursor()
     cur.execute("SELECT user_id, email, username, blocked, bitcoin_wallet FROM User WHERE user_id=%s", (user_id))
     user_data = cur.fetchone()
+    cur.close()
     # insert MySQL query here, return test data for the moment
     user_data = {"user_id": 123, "email": "johndoe@example.com", "username": "johndoe", "blocked": False, "bitcoin_wallet": "0x1234567890abcdef"}
 
@@ -42,6 +43,7 @@ def get_affiliate(session_data, affiliate_id):
     cur.execute("SELECT affiliate_id, user_id, total_bots_added, money_received FROM Affiliates WHERE affiliate_id=%s", (affiliate_id))
     user_data = cur.fetchone()
     # insert MySQL query here, return test data for the moment
+    cur.close()
     affiliate_data = {"affiliate_id": affiliate_id, "user_id": user_id, "total_bots_added": 10, "money_received": 100.0}
 
     if not affiliate_data:
@@ -60,6 +62,7 @@ def post_add_bot(session_data):
     
     os = request.json['os']
     ip_address = request.json['ip_address']
+    user_id = session_data["user_id"]
 
     # ensure parameters are strings
     if type(os) is not str or type(ip_address) is not str:
@@ -74,11 +77,16 @@ def post_add_bot(session_data):
         ipaddress.ip_address(ip_address)
     except ValueError:
         return jsonify({'message': 'Invalid IP address'}), 400
-    
-    # add bot to database
+
     cur = mysql.get_db().cursor()
-    cur.execute("INSERT INTO bots VALUES ()", ())
-    user_data = cur.fetchone()
+    # select affiliate id from user id
+    cur.execute("SELECT affiliate_id FROM Affiliates WHERE user_id=%s", (user_id))
+    affiliate_id = cur.fetchone()["affiliate_id"]
+    # add bot to database
+    cur.execute("INSERT INTO bots (os, ip_address) VALUES (%s, %s)", (os, ip_address))
+    mysql.connection.commit()
+    bot_id = cur.lastrowid
+    cur.execute("INSERT INTO Adds VALUES (%s, %s)", (bot_id, affiliate_id))
     # update affiliate information
     # insert MySQL query here, return test data for the moment
     response = {"bot_id": 123, "payment": BOT_PRICE_LINUX_WINDOWS if os!='MacOS' else BOT_PRICE_MACOS}
@@ -102,8 +110,15 @@ def post_send_command(session_data):
         return jsonify({'message': 'Invalid parameter data'}), 400
     
     # ensure user is authorized to access the information because they are the owner of the bot
+    user_id = session_data["user_id"]
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT bot_id FROM User_Bots WHERE user_id=%s AND bot_id=%s", (user_id, bot_id))
+    response = cur.fetchone()
+    cur.close()
+    authorized = False
+    if response["bot_id"] == bot_id:
+        authorized = True
     # insert MySQL query here, return test data for the moment
-    authorized = True
 
     if not authorized:
         return jsonify({'message': 'You do not have permission to access this information'}), 403
