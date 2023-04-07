@@ -1,5 +1,5 @@
 # imports
-from __main__ import app, token_required, BOT_PRICE_LINUX_WINDOWS, BOT_PRICE_MACOS#, mysql
+from __main__ import app, token_required, BOT_PRICE_LINUX_WINDOWS, BOT_PRICE_MACOS, mysql
 from flask import jsonify, request
 import ipaddress
 
@@ -13,6 +13,9 @@ def get_user(session_data, user_id):
         return jsonify({'message': 'You do not have permission to access this information'}), 403
     
     # get user information
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT user_id, email, username, blocked, bitcoin_wallet FROM User WHERE user_id=%s", (user_id))
+    user_data = cur.fetchone()
     # insert MySQL query here, return test data for the moment
     user_data = {"user_id": 123, "email": "johndoe@example.com", "username": "johndoe", "blocked": False, "bitcoin_wallet": "0x1234567890abcdef"}
 
@@ -35,6 +38,9 @@ def get_affiliate(session_data, affiliate_id):
         return jsonify({'message': 'You do not have permission to access this information'}), 403
     
     # get affiliate information
+    cur = mysql.get_db().cursor()
+    cur.execute("SELECT affiliate_id, user_id, total_bots_added, money_received FROM Affiliates WHERE affiliate_id=%s", (affiliate_id))
+    user_data = cur.fetchone()
     # insert MySQL query here, return test data for the moment
     affiliate_data = {"affiliate_id": affiliate_id, "user_id": user_id, "total_bots_added": 10, "money_received": 100.0}
 
@@ -70,6 +76,9 @@ def post_add_bot(session_data):
         return jsonify({'message': 'Invalid IP address'}), 400
     
     # add bot to database
+    cur = mysql.get_db().cursor()
+    cur.execute("INSERT INTO bots VALUES ()", ())
+    user_data = cur.fetchone()
     # update affiliate information
     # insert MySQL query here, return test data for the moment
     response = {"bot_id": 123, "payment": BOT_PRICE_LINUX_WINDOWS if os!='MacOS' else BOT_PRICE_MACOS}
