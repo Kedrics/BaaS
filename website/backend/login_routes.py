@@ -29,8 +29,8 @@ def post_register():
         return jsonify({'message': 'Invalid username length'}), 400
     
     # ensure username isn't already taken
-    cur = mysql.get_db().cursor()
-    cur.execute("SELECT username FROM User WHERE username=%s", (username))
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT username FROM User WHERE username=%s", (username,))
     users_found = cur.rowcount
     cur.close()
     username_taken = (users_found > 0)
@@ -47,12 +47,18 @@ def post_register():
         return jsonify({'message': 'Invalid bitcoin wallet'}), 400
 
     # insert user into database
-    cur = mysql.get_db().cursor()
+    cur = mysql.connection.cursor()
     cur.execute("INSERT INTO User (email, username, password, blocked, bitcoin_wallet) VALUES (%s, %s, %s, %s, %s)", (email, username, sha256(password.encode()).hexdigest(), 0, bitcoin_wallet))
     mysql.connection.commit()
     user_id = cur.lastrowid
     cur.close()
-    # use sha256(password.encode()).hexdigest() as password_hash
+
+    # add user as affiliate
+    cur = mysql.connection.cursor()
+    cur.execute("INSERT INTO Affiliates (user_id, Money_received, total_bots_added) VALUES (%s, %s, %s)", (user_id, 0, 0))
+    mysql.connection.commit()
+    cur.close()
+    
     response = {"user_id": user_id}
     return jsonify(response), 200
 
@@ -80,30 +86,35 @@ def post_login():
         return jsonify({'message': 'Password doesn\'t fit length requirements'}), 400
     
     # check if username exists
-    cur = mysql.get_db().cursor()
-    cur.execute("SELECT * FROM User WHERE username=%s", (username))
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT user_id,password,blocked FROM User WHERE username=%s", (username,))
     users_found = cur.rowcount
     response = cur.fetchone()
     cur.close()
-    # insert MySQL query here, return test data for the moment
     exists = (users_found > 0)
-    user_id = response["user_id"]
-    cur = mysql.get_db().cursor()
-    cur.execute("SELECT * FROM support_staff WHERE user_id=%s", (user_id))
-    staff_found = cur.rowcount
-    cur.close()
-    is_staff = (staff_found > 0)
 
     if not exists:
         return jsonify({'message': 'Invalid username or password'}), 401
     
-    # check if password is correct
-    # insert MySQL query here, return test data for the moment
+
+    user_id = response[0]
+    hash = response[1]
+    blocked = response[2]
+
+    # check if user is staff
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM Support_Staff WHERE user_id=%s", (user_id,))
+    staff_found = cur.rowcount
+    cur.close()
+    is_staff = (staff_found > 0)
    
-    # hash = 'a2c96d518f1099a3b6afe29e443340f9f5fdf1289853fc034908444f2bcb8982' # hash of 'testtesttest'
-    hash =  response["password"]
+    # check if password is correct
     if sha256(password.encode()).hexdigest() != hash:
         return jsonify({'message': 'Invalid username or password'}), 401
+    
+    # check if user is blocked
+    if blocked:
+        return jsonify({'message': 'User is blocked'}), 401
     
     # generate JWT
     token = jwt.encode({'user_id': user_id, "is_staff": is_staff}, app.config['SECRET_KEY'], algorithm='HS256')
