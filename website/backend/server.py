@@ -3,21 +3,22 @@ from flask import Flask, jsonify, request
 import jwt, secrets
 from flask_mysqldb import MySQL # sudo apt install default-libmysqlclient-dev
 from functools import wraps
+import os
 
 
 # initialize flask
 app = Flask(__name__)
-PORT = 8080
+PORT = 8000
 BOT_PRICE_LINUX_WINDOWS = 25.00
 BOT_PRICE_MACOS = 50.00
 BOT_MONTHLY_PRICE = 5.00
 
 # set up MySQL integration
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'JaromIsTheGoatt'
-app.config['MYSQL_DB'] = 'class'
-#mysql = MySQL(app)
+app.config['MYSQL_HOST'] = os.environ["MYSQL_HOST"]
+app.config['MYSQL_USER'] = os.environ["MYSQL_USER"]
+app.config['MYSQL_PASSWORD'] = os.environ["MYSQL_PASSWORD"]
+app.config['MYSQL_DB'] = os.environ["MYSQL_DB"]
+mysql = MySQL(app)
 
 # set up JWT integration
 app.config['SECRET_KEY'] = secrets.token_hex(32) # randomly-generated

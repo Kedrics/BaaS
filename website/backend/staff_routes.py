@@ -1,5 +1,5 @@
 # imports
-from __main__ import app, token_required#, mysql
+from __main__ import app, token_required, mysql
 from flask import jsonify, request
 
 
@@ -12,13 +12,17 @@ def get_staff(session_data, staff_id):
         return jsonify({'message': 'You do not have permission to access this information'}), 403
     
     # get staff information
-    # insert MySQL query here, return test data for the moment
-    data = {"staff_id": staff_id, "user_id": 123, "is_developer": 1}
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT staff_id, user_id, developer FROM Support_Staff WHERE staff_id=%s", (staff_id,))
+    data = cur.fetchone()
+    cur.close()
 
     if not data:
         return jsonify({'message': 'Staff member not found'}), 404
     
-    return jsonify(data), 200
+    response = {"staff_id": data[0], "user_id": data[2], "is_developer": data[1]==1}
+    
+    return jsonify(response), 200
 
 
 # POST add a staff member
@@ -40,9 +44,22 @@ def post_add_staff(session_data):
     if type(user_id) is not int or type(is_developer) is not bool:
         return jsonify({'message': 'Invalid parameter data'}), 400
     
+    # ensure user_id is valid
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT user_id FROM User WHERE user_id=%s", (user_id,))
+    data = cur.fetchone()
+
+    if not data:
+        return jsonify({'message': 'User not found'}), 404
+    
     # insert staff member into database
-    # insert MySQL query here, return test data for the moment
-    response = {"staff_id": 456, "developer": is_developer}
+    cur.execute("INSERT INTO Support_Staff (developer, user_id) VALUES (%s, %s)", (is_developer,user_id))
+    mysql.connection.commit()
+    staff_id = cur.lastrowid
+    cur.close()
+
+    # return staff info
+    response = {"staff_id": staff_id, "developer": is_developer}
 
     return jsonify(response), 200
 
@@ -67,14 +84,21 @@ def post_block_user(session_data):
         return jsonify({'message': 'Invalid parameter data'}), 400
     
     # ensure user exists
-    # insert MySQL query here, return test data for the moment
-    exists = True
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT user_id FROM User WHERE user_id=%s", (user_id,))
+    users_found = cur.rowcount
+    cur.close()
+    exists = (users_found > 0)
 
     if not exists:
         return jsonify({'message': 'User not found'}), 404
     
     # block user
-    # insert MySQL query here, return test data for the moment
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE User SET blocked=%s WHERE user_id=%s", (blocked, user_id))
+    mysql.connection.commit()
+    cur.close()
+
     response = {"msg": "User blocked" if blocked else "User unblocked"}
 
     return jsonify(response), 200
@@ -100,14 +124,21 @@ def post_approve_botnet_order(session_data):
         return jsonify({'message': 'Invalid parameter data'}), 400
     
     # ensure order exists
-    # insert MySQL query here, return test data for the moment
-    exists = True
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT order_id FROM User WHERE order_id=%s", (order_id,))
+    orders_found = cur.rowcount
+    cur.close()
+    exists = (orders_found > 0)
 
     if not exists:
         return jsonify({'message': 'Order not found'}), 404
     
     # approve order
-    # insert MySQL query here, return test data for the moment
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE Botnet_Order SET approved=%s WHERE order_id=%s", (approved, order_id))
+    mysql.connection.commit()
+    cur.close()
+    
     response = {"msg": "Order approved" if approved else "Order rejected"}
 
     return jsonify(response), 200
