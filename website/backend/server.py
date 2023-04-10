@@ -62,4 +62,4 @@ import botnet_order_routes
 
 # run the app
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=PORT, threaded=True, debug=True)
+    app.run(host='0.0.0.0', port=PORT, threaded=True, debug=False)
