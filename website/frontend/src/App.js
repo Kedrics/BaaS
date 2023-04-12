@@ -1,7 +1,10 @@
 import './App.css';
 import Todos from './pages/Todos'; //import any pages you have (this is my home page)
 import Surprise from './pages/Surprise'; //import any pages you have
-import {BrowserRouter, Routes, Route} from "react-router-dom"; //import the router to navigate pages
+import Login from './pages/Login';
+import User from './pages/User';
+import Bots from './pages/Bots';
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom"; //import the router to navigate pages
 import { ChakraProvider } from "@chakra-ui/react"; //import the Chakra UI library
 
 function App() {
@@ -14,8 +17,12 @@ function App() {
       <div className="App">
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Todos/>} />
+            <Route path="/" element={<Navigate to="/user" />}/>
             <Route path="/surprise" element={<Surprise/>} />
+            <Route path="/login" element={<Login/>} />
+            <Route path="/bots" element={<Bots/>} />
+            <Route path="/user/:id" element={<User/>} />
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </BrowserRouter>
       </div>
