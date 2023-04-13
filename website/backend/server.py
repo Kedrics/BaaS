@@ -6,6 +6,7 @@ from functools import wraps
 import os
 
 
+
 # initialize flask
 app = Flask(__name__)
 PORT = 8000
@@ -59,6 +60,11 @@ import ticket_routes
 ### BOTNET ORDER FUNCTIONALITY ###
 import botnet_order_routes
 
+@app.after_request
+def apply_caching(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
 
 # run the app
 if __name__ == "__main__":
