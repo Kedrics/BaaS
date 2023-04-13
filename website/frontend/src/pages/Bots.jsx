@@ -1,8 +1,8 @@
-import Navbar from '../components/Navbar';
-import { 
-    Box, 
+import Navbar from '../components/Navbar'
+import {
+    Box,
     Heading
-} from "@chakra-ui/react";
+} from "@chakra-ui/react"
 
 const Bots = () => {
     return (
@@ -11,10 +11,10 @@ const Bots = () => {
             <Heading
                 p={100}
                 color="whiteAlpha.800"
-            > 
+            >
             BOTS PAGE</Heading>
         </Box>
-    );
+    )
 }
 
-export default Bots;
+export default Bots

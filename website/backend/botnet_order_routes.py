@@ -6,8 +6,8 @@ from datetime import datetime
 
 # GET botnet order information
 @app.route('/api/botnet-orders/<int:order_id>', methods=['GET'])
-@token_required
-def get_botnet_order(session_data, order_id):
+#@token_required
+def get_botnet_order(order_id):
     # get user_id from order_id
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id, number_of_bots, time_of_use, price, approved, time_stamp FROM Botnet_Order WHERE order_id=%s", (order_id,))
@@ -20,8 +20,8 @@ def get_botnet_order(session_data, order_id):
     user_id = response[0]
 
     # ensure user is authorized to access the information
-    if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
-        return jsonify({'message': 'You do not have permission to access this information'}), 403
+    #if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
+    #    return jsonify({'message': 'You do not have permission to access this information'}), 403
     
     # return botnet order information
     response = {"number_of_bots": response[1], "order_id": order_id, "time_of_use": response[2], "price": response[3], "approved": response[4]==0, "time_stamp": response[5], "user_id": user_id}
@@ -31,8 +31,8 @@ def get_botnet_order(session_data, order_id):
 
 # POST create a botnet order
 @app.route('/api/botnet-orders', methods=['POST'])
-@token_required
-def post_create_botnet_order(session_data):
+#@token_required
+def post_create_botnet_order():
     # ensure needed parameters are present
     if (request.json is None) or ('number_of_bots' not in request.json) or ('time_of_use' not in request.json):
         return jsonify({'message': 'Missing required parameters'}), 400
@@ -40,7 +40,7 @@ def post_create_botnet_order(session_data):
     number_of_bots = request.json['number_of_bots']
     time_of_use = request.json['time_of_use']
     timestamp = datetime.utcnow().isoformat()
-    user_id = session_data["user_id"]
+    #user_id = session_data["user_id"]
 
     # ensure parameters are integers
     if type(number_of_bots) is not int or type(time_of_use) is not int:
@@ -59,7 +59,7 @@ def post_create_botnet_order(session_data):
 
     # insert botnet order into database
     cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO Botnet_Order (number_of_bots, time_of_use, price, time_stamp, user_id) VALUES (%s, %s, %s, %s, %s)", (number_of_bots, time_of_use, price, timestamp, user_id))
+    cur.execute("INSERT INTO Botnet_Order (number_of_bots, time_of_use, price, time_stamp, user_id) VALUES (%s, %s, %s, %s, %s)", (number_of_bots, time_of_use, price, timestamp, 1))
     mysql.connection.commit()
     order_id = cur.lastrowid
     cur.execute("SELECT * FROM Botnet_Order WHERE order_id=%s", (order_id,))
