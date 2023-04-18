@@ -29,6 +29,74 @@ def get_botnet_order(session_data, order_id):
     return jsonify(response), 200 
 
 
+# Delete botnet order information
+@app.route('/api/botnet-orders/<int:order_id>', methods=['DELETE'])
+@token_required
+def delete_botnet_order(session_data, order_id):
+    # get user_id from order_id
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT user_id, number_of_bots, time_of_use, price, approved, time_stamp FROM Botnet_Order WHERE order_id=%s", (order_id,))
+    response = cur.fetchone()
+    cur.close()
+
+    if not response:
+        return jsonify({'message': 'You do not have permission to access this information'}), 403
+
+    user_id = response[0]
+
+    # ensure user is authorized to access the information
+    if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
+        return jsonify({'message': 'You do not have permission to access this information'}), 403
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM Botnet_Order WHERE order_id=%s", (order_id))
+    cur.close()
+    # return botnet order information
+    response = {"deleted": 1, "number_of_bots": response[1], "order_id": order_id, "time_of_use": response[2], "price": response[3], "approved": response[4]==0, "time_stamp": response[5], "user_id": user_id}
+
+    return jsonify(response), 200
+
+# PUT update a botnet order
+@app.route('/api/botnet-orders/<int:order_id>', methods=['PUT'])
+@token_required
+def post_create_botnet_order(session_data, order_id):
+    # ensure needed parameters are present
+    if (request.json is None) or ('number_of_bots' not in request.json) or ('time_of_use' not in request.json):
+        return jsonify({'message': 'Missing required parameters'}), 400
+    
+    number_of_bots = request.json['number_of_bots']
+    time_of_use = request.json['time_of_use']
+    timestamp = datetime.utcnow().isoformat()
+    user_id = session_data["user_id"]
+
+    # ensure parameters are integers
+    if type(number_of_bots) is not int or type(time_of_use) is not int:
+        return jsonify({'message': 'Invalid parameter data'}), 400
+    
+    # ensure number of bots is positive
+    if number_of_bots <= 0:
+        return jsonify({'message': 'Invalid number of bots'}), 400
+    
+    # ensure time of use is positive and less than or equal to 12 months
+    if time_of_use <= 0 or time_of_use > 12:
+        return jsonify({'message': 'Invalid time of use'}), 400
+    
+    # calculate price
+    price = number_of_bots * time_of_use * BOT_MONTHLY_PRICE
+
+    # insert botnet order into database
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE Botnet_Order SET number_of_bots=%s, time_of_use=%s, price=%s, time_stamp=%s, user_id=%s WHERE order_id=%s", (number_of_bots, time_of_use, price, timestamp, user_id, order_id))
+    mysql.connection.commit()
+    order_id = cur.lastrowid
+    cur.execute("SELECT * FROM Botnet_Order WHERE order_id=%s", (order_id,))
+    response = cur.fetchone()
+    cur.close()
+    
+    response = {"order_id": order_id, "timestamp": timestamp, "price": price}
+
+    return jsonify(response), 200
+
+
 # POST create a botnet order
 @app.route('/api/botnet-orders', methods=['POST'])
 @token_required
