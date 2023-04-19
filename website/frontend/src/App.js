@@ -19,7 +19,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/login" />}/>
             <Route path="/login" element={<Login/>} />
-            <Route path="/bots" element={<Bots/>} />
+            <Route path="/:id/bots" element={<Bots/>} />
             <Route path="/botnet_orders" element={<BotnetOrders />}/>
             <Route path="/user/:id" element={<User/>} />
             <Route path="/register" element={<Register/>} />

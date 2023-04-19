@@ -23,6 +23,24 @@ def get_user(user_id):
 
     return jsonify({"user_id": user_data[0], "email": user_data[1], "username": user_data[2], "blocked": bool(user_data[3]), "bitcoin_wallet": user_data[4]}), 200
 
+# GET user bot information
+@app.route('/api/users/<int:user_id>/bots', methods=['GET'])
+#@token_required
+def get_user_bots(user_id):
+    # ensure user is authorized to access the information
+    # if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
+    #     return jsonify({'message': 'You do not have permission to access this information'}), 403
+
+    # get user information
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT bot_id, os, ip_address, user_id FROM User_Bots WHERE user_id=%s", (user_id,))
+    bot_data = cur.fetchall()
+    cur.close()
+
+    if not bot_data:
+        return jsonify({'message': 'Bot not found'}), 404
+
+    return jsonify({"bot_id": bot_data[0], "os": bot_data[1], "ip_address": bot_data[2], "interface_id": bot_data[3]}), 200
 
 # GET affiliate information
 @app.route('/api/affiliates/<int:affiliate_id>', methods=['GET'])

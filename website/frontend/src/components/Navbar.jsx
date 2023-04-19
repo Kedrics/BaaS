@@ -22,7 +22,7 @@ const Navbar = () => {
     <Flex as="nav" align="center" justify="space-between" wrap="wrap" padding="1rem" bg="blue.500" color="white">
       <Flex align="center" mr={5}>
         <Heading as="h1" size="lg" letterSpacing={'-.1rem'}>
-          <Link to="/login">Ur Mom Bot Net Dot Net</Link>
+          <Link to="/login">Bot Net Dot Net</Link>
         </Heading>
       </Flex>
 
@@ -52,12 +52,12 @@ const Navbar = () => {
             Menu
           </MenuButton>
           <MenuList bg="blackAlpha.500">
-            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/login">Login</Link></MenuItem>
-            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/register">Register</Link></MenuItem>
             <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/user">User Info</Link></MenuItem>
-            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/bots">Bots</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/bots">Your Bots</Link></MenuItem>
             <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/botnet_orders">Botnet Orders</Link></MenuItem>
             <MenuDivider />
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/login">Login</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/register">Register</Link></MenuItem>
             <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}> Fake Logout</MenuItem>
           </MenuList>
         </Menu>

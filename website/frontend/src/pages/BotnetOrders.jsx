@@ -25,7 +25,7 @@ const BotnetOrders = () => {
         setOrderID(prev => ({...prev, [e.target.name]: e.target.value})) //set the state to the value of the input
     }
 
-    const getBotInfo = async () => {
+    const getOrderInfo = async () => {
         try{
             const res = await axios.get(`http://api.app.com:40000/api/botnet-orders/${orderID.order_number}`) // this is the backend endpoint
                 setOrderData(res.data) // set the state to the data returned from the backend
@@ -74,7 +74,7 @@ const BotnetOrders = () => {
                                     <Input name="order_number" type="text" color='white' onChange={handleChange}/>
                                 </FormControl>
                                 <Stack spacing={10}>
-                                    <Button onClick={getBotInfo} bg={'blue.400'} color={'white'} _hover={{bg: 'blue.500'}}>
+                                    <Button onClick={getOrderInfo} bg={'blue.400'} color={'white'} _hover={{bg: 'blue.500'}}>
                                         Lookup
                                     </Button>
                                 </Stack>
