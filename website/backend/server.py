@@ -64,9 +64,9 @@ import botnet_order_routes
 def apply_caching(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE"
     return response
 
 # run the app
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=PORT, threaded=True, debug=False)
-

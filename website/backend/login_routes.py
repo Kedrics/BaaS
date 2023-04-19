@@ -120,6 +120,6 @@ def post_login():
     token = jwt.encode({'user_id': user_id, "is_staff": is_staff}, app.config['SECRET_KEY'], algorithm='HS256')
 
     resp = make_response(jsonify({'message': 'Successfully logged in',"user_id": user_id}), 200)
-    resp.set_cookie('token', token, max_age=3000, httponly=True, path='/', domain='app.com', secure=False, samesite='Lax')
+    resp.set_cookie('token', token, httponly=True, domain='127.0.0.1')
 
     return resp
