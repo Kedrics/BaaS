@@ -38,7 +38,7 @@ const routeChange = (path) => {
 
     const handleClick = async (e) => {
         try {
-            const res = await axios.post("http://api.app.com:40000/api/login", credentials)
+            const res = await axios.post("http://localhost:40000/api/login", credentials)
             //setTodos(prevTodos => [...prevTodos, res.data]) //add the new todo to the list of todos
             setNewCreds({
               username: "",

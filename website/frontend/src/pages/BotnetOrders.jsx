@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from "react"
+import React, { useState } from "react"
 import axios from 'axios'
 import Navbar from '../components/Navbar'
 import ListItem from '../components/ListItem'
@@ -12,6 +12,7 @@ import {
     Flex,
     Heading,
     Text,
+    VStack,
 } from "@chakra-ui/react"
 
 const BotnetOrders = () => {
@@ -19,6 +20,8 @@ const BotnetOrders = () => {
     const [orderData, setOrderData] = useState({})
     const [orderID, setOrderID] = useState(``)
     const [renderData, setRenderData] = useState(false)
+    const [isUpdate, setIsUpdate] = useState(false)
+    const [updatedOrderData, setUpdatedOrderData] = useState({})
 
         //handleChange and handleClick- for the post method
     const handleChange = (e) => {
@@ -27,11 +30,10 @@ const BotnetOrders = () => {
 
     const getOrderInfo = async () => {
         try{
-            const res = await axios.get(`http://api.app.com:40000/api/botnet-orders/${orderID.order_number}`) // this is the backend endpoint
+            const res = await axios.get(`http://localhost:40000/api/botnet-orders/${orderID.order_number}`) // this is the backend endpoint
                 setOrderData(res.data) // set the state to the data returned from the backend
-                console.log(res.data)
-                const priceWithDollar = "$" + res.data.price
             const {
+                price,
                 number_of_bots,
                 order_id,
                 user_id,
@@ -39,7 +41,7 @@ const BotnetOrders = () => {
                 time_stamp,
                 approved,
             } = res.data
-            setOrderData({priceWithDollar, number_of_bots, order_id, user_id, time_of_use, time_stamp, approved})
+            setOrderData({price, number_of_bots, order_id, user_id, time_of_use, time_stamp, approved})
             handleRenderData()
         }
         catch(err){
@@ -47,14 +49,45 @@ const BotnetOrders = () => {
         }
     }
 
-    const handleRenderData = () => {
-        setRenderData(!renderData)
+    const handleDelete = async () => {
+        try{
+            const res = await axios.delete(`http://localhost:40000/api/botnet-orders/${orderID.order_number}`) // this is the backend endpoint
+        }
+        catch(err){
+            console.error(err.message) // console log the error
+        }
+    }
+
+    const handleChangeOrderInfo = async () => {
+        try{
+            if (updatedOrderData !== {}){
+                const res = await axios.put(`http://localhost:40000/api/botnet-orders/${orderID.order_number}`, updatedOrderData) // this is the backend endpoint
+            }
+            else {
+                alert(`Please enter a value to update or cancel the update`)
+            }
+        }
+        catch(err){
+            console.error(err.message) // console log the error
+        }
     }
 
     const handleClickBack = () => {
         window.location.reload(false)
     }
 
+    const handleRenderData = () => {
+        setRenderData(!renderData)
+    }
+
+    const handleIsUpdate = () => {
+        if (isUpdate === false)
+            setUpdatedOrderData(orderData)
+        setIsUpdate(!isUpdate)
+    }
+    const handleChangeUpdateInput = (e) => {
+        setUpdatedOrderData(prev => ({...prev, [e.target.name]: Number(e.target.value)})) //set the state to the value of the input
+    }
     return (
         <>
             {renderData === false &&
@@ -81,11 +114,6 @@ const BotnetOrders = () => {
                             </Stack>
                         </Box>
                         </Stack>
-                        {
-                            Object.entries(orderData).map((item, i) => {
-                                return <ListItem key={i} name={item[0]} value={item[1]} />
-                            })
-                        }
                     </Flex>
                 </Box>
             }
@@ -94,15 +122,59 @@ const BotnetOrders = () => {
                     <Navbar />
                         <Heading color='white'>Order</Heading>
                     <Flex direction="column" align="center">
-                        {
+                        { isUpdate === false ?
                             Object.entries(orderData).map((item, i) => {
-                                return <ListItem key={i} name={item[0]} value={item[1]} />
+                                return <ListItem key={i} name={item[0]} value={item[1]} isUpdate={isUpdate} />
                             })
+                            :
+
+                            <>
+                                {
+                                    Object.entries(orderData).map((item, i) => {
+                                        return (
+                                            <FormControl key={i}>
+                                                <FormLabel color='white'>{item[0]}</FormLabel>
+                                                <ListItem name={item[0]} value={item[1]} isUpdate={isUpdate} handleChangeUpdateInput={handleChangeUpdateInput} />
+                                            </FormControl>
+                                        )
+                                    })
+                                }
+                                <Button
+                                onClick={handleChangeOrderInfo}
+                                bg='green.400'
+                                color='white'
+                                _hover={{bg: 'green.600'}}
+                                >
+                                    Submit
+                                </Button>
+                            </>
+
                         }
                     </Flex>
-                    <Button onClick={handleClickBack} bg={'gray.600'} color={'white'} _hover={{bg: 'gray.700'}}>
-                        Back
-                    </Button>
+                    <VStack spacing={4} align='full'>
+                        <Button onClick={handleClickBack} bg={'gray.600'} color={'white'} _hover={{bg: 'gray.700'}}>
+                            Back
+                        </Button>
+                        <Button
+                        onClick={() => {
+                            handleDelete()
+                            handleClickBack()
+                            }
+                        }
+                        bg={'red.500'} color={'white'} _hover={{bg: 'red.700'}}>
+                            Delete
+                        </Button>
+                        {isUpdate ?
+                            <Button onClick={handleIsUpdate} bg={'white'} color={'black'} _hover={{bg: 'white.300'}}>
+                                Cancel
+                            </Button>
+                            :
+                            <Button onClick={handleIsUpdate} bg={'yellow.400'} color={'white'} _hover={{bg: 'yellow.500'}}>
+                                Update
+                            </Button>
+                        }
+
+                    </VStack>
                 </Box>
             }
         </>

@@ -21,7 +21,7 @@ const User = () => {
 
     const getUserInfo = async () => {
         try{
-            const res = await axios.get(`http://api.app.com:40000/api/users/${UID}`) // this is the backend endpoint
+            const res = await axios.get(`http://localhost:40000/api/users/${UID}`) // this is the backend endpoint
             const {
                 email,
                 username,
@@ -44,7 +44,7 @@ const User = () => {
     return (
         <Box bg="blackAlpha.900" h="100%" minH="100vh" pb={5}>
             <Navbar />
-                <Heading color='white'>HELLOE THIS I TEH USER PAGE</Heading>
+                <Heading color='white'>USER PAGE</Heading>
             <Flex direction="column" align="center">
                 {
                     Object.entries(userData).map((item, i) => {

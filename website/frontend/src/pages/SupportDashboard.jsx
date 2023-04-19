@@ -1,19 +1,16 @@
 import Navbar from '../components/Navbar'
 import {
     Box,
-    Flex,
     Heading,
 } from "@chakra-ui/react"
 
-const Bots = () => {
+const SupportDashboard = () => {
     return (
         <Box bg="blackAlpha.900" h="100%" minH="100vh" pb={5}>
             <Navbar />
-                <Heading color='white'>Your Bots</Heading>
-            <Flex direction="column" align="center">
-            </Flex>
+            <Heading color='white'>SUPPORT DASHBOARD</Heading>
         </Box>
     )
 }
 
-export default Bots
+export default SupportDashboard

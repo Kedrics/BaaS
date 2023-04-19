@@ -52,13 +52,19 @@ const Navbar = () => {
             Menu
           </MenuButton>
           <MenuList bg="blackAlpha.500">
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/dashboard">Main Dashboard</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/affiliate-dashboard">Affiliate Dashboard</Link></MenuItem>
+            <MenuDivider />
             <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/user">User Info</Link></MenuItem>
-            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/bots">Your Bots</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/1/bots">Your Bots</Link></MenuItem>
             <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/botnet_orders">Botnet Orders</Link></MenuItem>
             <MenuDivider />
             <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/login">Login</Link></MenuItem>
             <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/register">Register</Link></MenuItem>
             <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}> Fake Logout</MenuItem>
+            <MenuDivider />
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/support">Support</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/support-dashboard">Support Dashboard</Link></MenuItem>
           </MenuList>
         </Menu>
       </Box>

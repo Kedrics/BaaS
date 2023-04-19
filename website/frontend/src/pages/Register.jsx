@@ -40,7 +40,7 @@ const routeChange = (path) => {
 
     const handleClick = async (e) => {
         try {
-            const res = await axios.post("http://api.app.com:40000/api/register", credentials)
+            const res = await axios.post("http://localhost:40000/api/register", credentials)
             setNewCreds({
               username: "",
               password: ""
