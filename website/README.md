@@ -20,11 +20,11 @@ This required node.js to be installed on your device.  Installing this is just a
 
 1. Navigate into the backend folder: ```cd backend```
 2. Install the dependencies: ```npm install```
-3. If you want to run your backend on a port other than 8080, open the index.js file and edit the port number on the following line: 
+3. If you want to run your backend on a port other than 8080, open the index.js file and edit the port number on the following line:
 ``` javascript
 //listen on port 8080, or change to desired port
 app.listen(8080, () => {
-  console.log("Server is running")
+    console.log("Server is running")
 });
 ```
 4. Run the server with nodemon (nodemon allows us to make live changes without restarting the backend): ```npm start```

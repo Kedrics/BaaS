@@ -26,8 +26,10 @@ const routeChange = (path) => {
 }
     //states- one for each backend method
     const [credentials, setNewCreds] = useState({ //For the post method
+        email: "", // corresponds to the name of the field in the json body
         username: "",
-        password: "" //corresponds to the name of the field in the json body
+        bitcoin_wallet: "",
+        password: "",
     })
 
 
@@ -38,15 +40,13 @@ const routeChange = (path) => {
 
     const handleClick = async (e) => {
         try {
-            const res = await axios.post("http://localhost:40000/api/login", credentials)
-            //setTodos(prevTodos => [...prevTodos, res.data]) //add the new todo to the list of todos
+            const res = await axios.post("http://localhost:40000/api/register", credentials)
             setNewCreds({
               username: "",
               password: ""
             }) // reset the form
           if (res.status === 200)
-            // alert("we not chiangnasing")
-           routeChange(`/user/${res.data[`user_id`]}`)
+            routeChange(`/user/${res.data[`user_id`]}`)
         } catch(err) {
             alert(`Something went wrong with the login!`)
             console.log(err)
@@ -64,7 +64,7 @@ const routeChange = (path) => {
 
             <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
               <Stack align={'center'}>
-                <Heading fontSize={'4xl'}>Sign in to your account</Heading>
+                <Heading fontSize={'4xl'}>Regsiter your account</Heading>
                 <Text fontSize={'lg'} color={'gray.600'}>
                   to enjoy all of our cool <Link color={'blue.400'}>features</Link> ✌️
                 </Text>
@@ -75,13 +75,21 @@ const routeChange = (path) => {
                 boxShadow={'lg'}
                 p={8}>
                 <Stack spacing={4}>
+                  <FormControl id="email">
+                    <FormLabel>Email</FormLabel>
+                    <Input name="email" type="text" onChange={handleChange}/>
+                  </FormControl>
                   <FormControl id="username">
                     <FormLabel>Username</FormLabel>
                     <Input name="username" type="text" onChange={handleChange}/>
                   </FormControl>
+                  <FormControl id="bitcoin_wallet">
+                    <FormLabel>Bitcoin Wallet</FormLabel>
+                    <Input name="bitcoin_wallet" type="text" onChange={handleChange}/>
+                  </FormControl>
                   <FormControl id="password">
                     <FormLabel>Password</FormLabel>
-                    <Input name="password" type="password"onChange={handleChange} />
+                    <Input name="password" type="password" onChange={handleChange} />
                   </FormControl>
                   <Stack spacing={10}>
                     <Button
@@ -91,7 +99,7 @@ const routeChange = (path) => {
                       _hover={{
                         bg: 'blue.500',
                       }}>
-                      Sign in
+                      Register
                     </Button>
                   </Stack>
                 </Stack>

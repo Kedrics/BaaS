@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Box,
   Button,
@@ -10,19 +10,19 @@ import {
   MenuDivider,
   MenuList,
   MenuItem
-} from '@chakra-ui/react'; //imports from Chakra UI
+} from '@chakra-ui/react' //imports from Chakra UI
 
 //Navbar component (only renders the nav bar rather than a full page)
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false); //state for the menu
+  const [isOpen, setIsOpen] = useState(false) //state for the menu
 
-  const toggle = () => setIsOpen(!isOpen); //function to toggle the menu
+  const toggle = () => setIsOpen(!isOpen) //function to toggle the menu
 
   return (
     <Flex as="nav" align="center" justify="space-between" wrap="wrap" padding="1rem" bg="blue.500" color="white">
       <Flex align="center" mr={5}>
         <Heading as="h1" size="lg" letterSpacing={'-.1rem'}>
-          Todo List
+          <Link to="/login">Bot Net Dot Net</Link>
         </Heading>
       </Flex>
 
@@ -52,15 +52,24 @@ const Navbar = () => {
             Menu
           </MenuButton>
           <MenuList bg="blackAlpha.500">
-            <MenuItem bg="blackAlpha.500"><Link to="/">My Todo List</Link></MenuItem>
-            <MenuItem bg="blackAlpha.500"><Link to="/surprise">Surprise</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/dashboard">Main Dashboard</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/affiliate-dashboard">Affiliate Dashboard</Link></MenuItem>
             <MenuDivider />
-            <MenuItem bg="blackAlpha.500"> Fake Logout</MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/user">User Info</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/1/bots">Your Bots</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/botnet_orders">Botnet Orders</Link></MenuItem>
+            <MenuDivider />
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/login">Login</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/register">Register</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}> Fake Logout</MenuItem>
+            <MenuDivider />
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/support">Support</Link></MenuItem>
+            <MenuItem bg="blackAlpha.500" _hover={{bg: 'gray.700'}}><Link to="/support-dashboard">Support Dashboard</Link></MenuItem>
           </MenuList>
         </Menu>
       </Box>
     </Flex>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

@@ -10,7 +10,7 @@ def post_register():
     # ensure needed parameters are present
     if (request.json is None) or ('email' not in request.json) or ('username' not in request.json) or ('password' not in request.json) or ('bitcoin_wallet' not in request.json):
         return jsonify({'message': 'Missing required parameters'}), 400
-    
+
     email = request.json['email']
     username = request.json['username']
     password = request.json['password']
@@ -19,15 +19,15 @@ def post_register():
     # ensure parameters are strings
     if type(email) is not str or type(username) is not str or type(password) is not str or type(bitcoin_wallet) is not str:
         return jsonify({'message': 'Invalid parameter data'}), 400
-    
+
     # ensure email is valid
     if not re.fullmatch(r'\b[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', email):
         return jsonify({'message': 'Invalid email'}), 400
-    
+
     # ensure username is valid
     if len(username) < 4 or len(username) > 255:
         return jsonify({'message': 'Invalid username length'}), 400
-    
+
     # ensure username isn't already taken
     cur = mysql.connection.cursor()
     cur.execute("SELECT username FROM User WHERE username=%s", (username,))
@@ -37,11 +37,11 @@ def post_register():
 
     if username_taken:
         return jsonify({'message': 'Username already taken'}), 500
-    
+
     # ensure password is valid
     if len(password) < 12 or len(password) > 255:
         return jsonify({'message': 'Password doesn\'t fit length requirements'}), 400
-    
+
     # ensure bitcoin wallet is valid
     if not re.fullmatch(r'0x[0-9a-fA-F]+', bitcoin_wallet):
         return jsonify({'message': 'Invalid bitcoin wallet'}), 400
@@ -58,7 +58,7 @@ def post_register():
     cur.execute("INSERT INTO Affiliates (user_id, Money_received, total_bots_added) VALUES (%s, %s, %s)", (user_id, 0, 0))
     mysql.connection.commit()
     cur.close()
-    
+
     response = {"user_id": user_id}
     return jsonify(response), 200
 
@@ -69,22 +69,22 @@ def post_login():
     # ensure needed parameters are present
     if (request.json is None) or ('username' not in request.json) or ('password' not in request.json):
         return jsonify({'message': 'Missing required parameters'}), 400
-    
+
     username = request.json['username']
     password = request.json['password']
 
     # ensure parameters are strings
     if type(username) is not str or type(password) is not str:
         return jsonify({'message': 'Invalid parameter data'}), 400
-    
+
     # ensure username is valid
     if len(username) < 4 or len(username) > 255:
         return jsonify({'message': 'Invalid username length'}), 400
-    
+
     # ensure password is valid
     if len(password) < 12 or len(password) > 255:
         return jsonify({'message': 'Password doesn\'t fit length requirements'}), 400
-    
+
     # check if username exists
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id,password,blocked FROM User WHERE username=%s", (username,))
@@ -95,7 +95,7 @@ def post_login():
 
     if not exists:
         return jsonify({'message': 'Invalid username or password'}), 401
-    
+
 
     user_id = response[0]
     hash = response[1]
@@ -107,15 +107,15 @@ def post_login():
     staff_found = cur.rowcount
     cur.close()
     is_staff = (staff_found > 0)
-   
+
     # check if password is correct
     if sha256(password.encode()).hexdigest() != hash:
         return jsonify({'message': 'Invalid username or password'}), 401
-    
+
     # check if user is blocked
     if blocked:
         return jsonify({'message': 'User is blocked'}), 401
-    
+
     # generate JWT
     token = jwt.encode({'user_id': user_id, "is_staff": is_staff}, app.config['SECRET_KEY'], algorithm='HS256')
 
